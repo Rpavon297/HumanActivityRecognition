@@ -18,13 +18,30 @@ def index(request):
 @csrf_exempt
 @require_POST
 def update_data(request):
-    data = SensorData(x=request.POST['x'], y=request.POST['y'], z=request.POST['z'], instant=request.POST['instant'])
+    data = SensorData(accelx=request.POST['accelx'],
+                      accely=request.POST['accely'],
+                      accelz=request.POST['accelz'],
+                      gyrox=request.POST['gyrox'],
+                      gyroy=request.POST['gyroy'],
+                      gyroz=request.POST['gyroz'],
+                      velx=request.POST['velx'],
+                      vely=request.POST['vely'],
+                      velz=request.POST['velz'],
+                      instant=request.POST['instant'])
     data.save()
-    return HttpResponse("a")
+    return HttpResponse("")
 
 
 def update_view(sender, instance, **kwargs):
-    print("ok")
+    data = instance
+
+    prediction = "first loop."
+    if data.accelx == "2":
+        prediction = "second loop."
+    if data.accelx == "3":
+        prediction = "third loop."
+
+    print("[" + str(data.instant) + "]: " + prediction)
 
 
 post_save.connect(update_view, sender=SensorData)
