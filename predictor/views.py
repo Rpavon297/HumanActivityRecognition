@@ -12,7 +12,8 @@ from predictor.serializers import SensorDataSerializer
 
 def index(request):
     context = {
-        'prediction': 'walking',
+        'prediction': 'prediction here',
+        'data': 'data here'
     }
     return render(request, 'index.html', context=context)
 
@@ -34,7 +35,7 @@ class MakePrediction(APIView):
                               velz=request.data['velz'],
                               instant=request.data['instant'])
 
-            self.response = LSTM(data)
+            self.response = lstm(data)
         except Exception as e:
             self.error = True
         return Response({
@@ -49,18 +50,22 @@ class AddData(APIView):
 
     def post(self, request):
         try:
-            data = SensorData(accelx=request.data['accelx'],
-                              accely=request.data['accely'],
-                              accelz=request.data['accelz'],
-                              gyrox=request.data['gyrox'],
-                              gyroy=request.data['gyroy'],
-                              gyroz=request.data['gyroz'],
-                              velx=request.data['velx'],
-                              vely=request.data['vely'],
-                              velz=request.data['velz'],
-                              instant=request.data['instant'],
-                              activity=request.data['activity'])
-            data.save()
+            package = request.data['captures']
+
+            for sensorCapture in package:
+                data = SensorData(accelx=sensorCapture['accelx'],
+                                  accely=sensorCapture['accely'],
+                                  accelz=sensorCapture['accelz'],
+                                  gyrox=sensorCapture['gyrox'],
+                                  gyroy=sensorCapture['gyroy'],
+                                  gyroz=sensorCapture['gyroz'],
+                                  velx=sensorCapture['velx'],
+                                  vely=sensorCapture['vely'],
+                                  velz=sensorCapture['velz'],
+                                  instant=sensorCapture['instant'],
+                                  activity=sensorCapture['activity'])
+                data.save()
+
         except Exception as e:
             self.error = True
 
@@ -89,19 +94,14 @@ class GetDataset(APIView):
             'error': self.error
         })
 
+
 def update_view(sender, instance, **kwargs):
-    data = instance
+    prediction = lstm(instance)
 
-    prediction = "first loop."
-    if data.accelx == "2":
-        prediction = "second loop."
-    if data.accelx == "3":
-        prediction = "third loop."
-
-    print("[" + str(data.instant) + "]: " + prediction)
+    # print("[" + str(instance.instant) + "]: " + prediction)
 
 
-def LSTM(data):
+def lstm(data):
         prediction = "first loop."
         if data.accelx == "2":
             prediction = "second loop."
@@ -111,4 +111,4 @@ def LSTM(data):
         return prediction
 
 
-# post_save.connect(update_view, sender=SensorData)
+post_save.connect(update_view, sender=SensorData)
