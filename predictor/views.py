@@ -98,6 +98,7 @@ class GetDataset(APIView):
 def update_view(sender, instance, **kwargs):
     prediction = lstm(instance)
 
+    return prediction
     # print("[" + str(instance.instant) + "]: " + prediction)
 
 
