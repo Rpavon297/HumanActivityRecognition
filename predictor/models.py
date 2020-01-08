@@ -14,6 +14,8 @@ class SensorData(models.Model):
     vely = models.DecimalField(max_digits=30, decimal_places=10)
     velz = models.DecimalField(max_digits=30, decimal_places=10)
 
+    sequence = models.CharField(max_length=100, null=False)
+
     activity = models.CharField(max_length=100, null=True)
 
     instant = models.DateTimeField()
