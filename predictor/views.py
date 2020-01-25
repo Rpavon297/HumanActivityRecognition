@@ -51,6 +51,8 @@ class AddData(APIView):
     def post(self, request):
         try:
             package = request.data['captures']
+            sequence = request.data['sequence']
+            activity = request.data['activity']
 
             for sensorCapture in package:
                 data = SensorData(accelx=sensorCapture['accelx'],
@@ -63,7 +65,8 @@ class AddData(APIView):
                                   vely=sensorCapture['vely'],
                                   velz=sensorCapture['velz'],
                                   instant=sensorCapture['instant'],
-                                  activity=sensorCapture['activity'])
+                                  activity=activity,
+                                  sequence=sequence)
                 data.save()
 
         except Exception as e:
@@ -94,6 +97,22 @@ class GetDataset(APIView):
             'error': self.error
         })
 
+class ClearDatabase(APIView):
+    error = False
+    response = ""
+
+    def post(self, request):
+        try:
+            data = SensorData.objects.all()
+            data.delete()
+
+        except Exception as e:
+            self.error = True
+
+        return Response({
+            'response': self.response,
+            'error': self.error
+        })
 
 def update_view(sender, instance, **kwargs):
     prediction = lstm(instance)
