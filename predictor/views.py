@@ -82,11 +82,9 @@ class GetDataset(APIView):
     error = False
     response = ""
 
-    def post(self, request):
+    def get(self, request):
         try:
-            clas = request.data['activity']
-
-            data = SensorData.objects.filter(activity=clas)
+            data = SensorData.objects.all()
             self.response = SensorDataSerializer(data, many=True).data
 
         except Exception as e:

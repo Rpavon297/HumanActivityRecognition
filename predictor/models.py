@@ -10,9 +10,9 @@ class SensorData(models.Model):
     gyroy = models.DecimalField(max_digits=30, decimal_places=10)
     gyroz = models.DecimalField(max_digits=30, decimal_places=10)
 
-    velx = models.DecimalField(max_digits=30, decimal_places=10)
-    vely = models.DecimalField(max_digits=30, decimal_places=10)
-    velz = models.DecimalField(max_digits=30, decimal_places=10)
+    orientx = models.DecimalField(max_digits=30, decimal_places=10)
+    orienty = models.DecimalField(max_digits=30, decimal_places=10)
+    orientz = models.DecimalField(max_digits=30, decimal_places=10)
 
     sequence = models.CharField(max_length=100, null=False)
 
