@@ -11,9 +11,12 @@ from predictor.serializers import SensorDataSerializer
 
 
 def index(request):
+    sensordata = SensorData.objects.all()
+    data = SensorDataSerializer(sensordata, many=True).data
+
     context = {
-        'prediction': 'prediction here',
-        'data': 'data here'
+        'prediction': '',
+        'data': len(data)
     }
     return render(request, 'index.html', context=context)
 
