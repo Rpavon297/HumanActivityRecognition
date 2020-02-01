@@ -61,9 +61,9 @@ class AddData(APIView):
                                   gyrox=sensorCapture['gyrox'],
                                   gyroy=sensorCapture['gyroy'],
                                   gyroz=sensorCapture['gyroz'],
-                                  velx=sensorCapture['velx'],
-                                  vely=sensorCapture['vely'],
-                                  velz=sensorCapture['velz'],
+                                  orientx=sensorCapture['orientx'],
+                                  orienty=sensorCapture['orienty'],
+                                  orientz=sensorCapture['orientz'],
                                   instant=sensorCapture['instant'],
                                   activity=activity,
                                   sequence=sequence)
@@ -85,7 +85,13 @@ class GetDataset(APIView):
     def get(self, request):
         try:
             data = SensorData.objects.all()
-            self.response = SensorDataSerializer(data, many=True).data
+            captures = SensorDataSerializer(data, many=True).data
+
+            classified = {}
+            for capture in captures:
+                classified.setdefault(capture['activity'], []).append(capture)
+
+            self.response = classified
 
         except Exception as e:
             self.error = True
