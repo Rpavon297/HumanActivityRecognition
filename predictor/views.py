@@ -1,3 +1,4 @@
+import numpy as np
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -6,7 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from predictor.models import SensorData
+from predictor.models import SensorData, CurrentActivity
 from predictor.serializers import SensorDataSerializer
 
 
@@ -25,6 +26,24 @@ def index(request):
     }
     return render(request, 'index.html', context=context)
 
+def prediction(request):
+    prediction = CurrentActivity.objects.all()
+
+    context = {
+        'prediction': prediction
+    }
+
+    return render(request, 'prediction.html', context=context)
+
+def lstm(data):
+    prediction = "first loop."
+    if data.accelx == "2":
+        prediction = "second loop."
+    if data.accelx == "3":
+        prediction = "third loop."
+
+    return prediction
+
 
 class MakePrediction(APIView):
     error = False
@@ -32,18 +51,21 @@ class MakePrediction(APIView):
 
     def post(self, request):
         try:
-            data = SensorData(accelx=request.data['accelx'],
-                              accely=request.data['accely'],
-                              accelz=request.data['accelz'],
-                              gyrox=request.data['gyrox'],
-                              gyroy=request.data['gyroy'],
-                              gyroz=request.data['gyroz'],
-                              velx=request.data['velx'],
-                              vely=request.data['vely'],
-                              velz=request.data['velz'],
-                              instant=request.data['instant'])
+            package = request.data['captures']
+            X = []
 
-            self.response = lstm(data)
+            for sensorCapture in package:
+                row = []
+                for item in sensorCapture.items():
+                    row.append(item)
+                X.append(row)
+            X = np.transpose(X)
+
+            self.response = lstm(X)
+
+            current_activity = CurrentActivity.objects.get_or_create(device_key=request.data['device_key'])
+            current_activity.activity = self.response
+            current_activity.save()
         except Exception as e:
             self.error = True
         return Response({
@@ -109,6 +131,7 @@ class GetDataset(APIView):
             'error': self.error
         })
 
+
 class ClearDatabase(APIView):
     error = False
     response = ""
@@ -126,21 +149,11 @@ class ClearDatabase(APIView):
             'error': self.error
         })
 
+
 def update_view(sender, instance, **kwargs):
     prediction = lstm(instance)
 
     return prediction
     # print("[" + str(instance.instant) + "]: " + prediction)
-
-
-def lstm(data):
-        prediction = "first loop."
-        if data.accelx == "2":
-            prediction = "second loop."
-        if data.accelx == "3":
-            prediction = "third loop."
-
-        return prediction
-
 
 post_save.connect(update_view, sender=SensorData)
