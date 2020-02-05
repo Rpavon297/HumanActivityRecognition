@@ -13,10 +13,15 @@ from predictor.serializers import SensorDataSerializer
 def index(request):
     sensordata = SensorData.objects.all()
     data = SensorDataSerializer(sensordata, many=True).data
+    classes = [];
+
+    for point in data:
+        if point['activity'] not in classes:
+            classes.append(point['activity']);
 
     context = {
-        'prediction': '',
-        'data': len(data)
+        'data': len(data),
+        'classes': classes
     }
     return render(request, 'index.html', context=context)
 
