@@ -1,4 +1,7 @@
 import numpy as np
+import SimplifiedHAR as harnet
+import matlab
+
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
@@ -9,6 +12,13 @@ from rest_framework.views import APIView
 
 from predictor.models import SensorData, CurrentActivity
 from predictor.serializers import SensorDataSerializer
+
+session = {}
+
+
+def start_up():
+    print('Initializing neural network...')
+    session['handle'] = harnet.initialize()
 
 
 def index(request):
@@ -26,6 +36,7 @@ def index(request):
     }
     return render(request, 'index.html', context=context)
 
+
 def prediction(request):
     prediction = CurrentActivity.objects.all()
 
@@ -35,19 +46,23 @@ def prediction(request):
 
     return render(request, 'prediction.html', context=context)
 
-def lstm(data):
-    prediction = "first loop."
-    if data.accelx == "2":
-        prediction = "second loop."
-    if data.accelx == "3":
-        prediction = "third loop."
 
-    return prediction
+def lstm(data):
+    # return session['handle'].predict(data.tolist())
+    list = data.tolist()
+
+    for i in range(0, len(data)):
+        for j in range(0, len(data[i])):
+            list[i][j] = float(list[i][j])
+
+    session['handle'].predict(matlab.double(list))
+    return "hey"
 
 
 class MakePrediction(APIView):
     error = False
     response = ""
+    handle = None
 
     def post(self, request):
         try:
@@ -56,16 +71,16 @@ class MakePrediction(APIView):
 
             for sensorCapture in package:
                 row = []
-                for item in sensorCapture.items():
-                    row.append(item)
+                for item in sensorCapture:
+                    row.append(sensorCapture[item])
                 X.append(row)
             X = np.transpose(X)
 
             self.response = lstm(X)
 
-            current_activity = CurrentActivity.objects.get_or_create(device_key=request.data['device_key'])
-            current_activity.activity = self.response
-            current_activity.save()
+            # current_activity = CurrentActivity.objects.get_or_create(device_key=request.data['device_key'])
+            # current_activity.activity = self.response
+            # current_activity.save()
         except Exception as e:
             self.error = True
         return Response({
@@ -138,7 +153,8 @@ class ClearDatabase(APIView):
 
     def post(self, request):
         try:
-            data = SensorData.objects.all()
+            activity = request['activity']
+            data = SensorData.objects.filter(activity=activity)
             data.delete()
 
         except Exception as e:
@@ -155,5 +171,6 @@ def update_view(sender, instance, **kwargs):
 
     return prediction
     # print("[" + str(instance.instant) + "]: " + prediction)
+
 
 post_save.connect(update_view, sender=SensorData)
