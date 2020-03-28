@@ -4,12 +4,60 @@
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<link rel="stylesheet" href="{{ STATIC_URL }}/static/css/general.css">
+<script type="text/javascript" src="{{ STATIC_URL }} /static/jquery-3.4.1.min.js">
+</script>
+<script>
+    var refreshing = false;
+
+    function refresh(){
+        $.ajax({
+            type: 'GET',
+            url: '/predictor/current/',
+            success: function(data){
+                console.log('done');
+                $("#prediction").html(data['current']);
+                $("#time").html(data['time']);
+
+                if(refreshing) {
+                    setTimeout(refresh, 1000);
+                }
+            }
+        })
+    };
+
+    function start_refresh(){
+        refreshing = true;
+        refresh();
+    }
+
+    function stop_refresh() {
+        refreshing = false;
+    }
+</script>
 <body>
-<h3>
-    Number of data points: {{ data }}
-</h3>
-<h3>
-    Classes: {{ classes }}
-</h3>
+<div class="main-content">
+    <div class="prediction-content">
+        <h3>
+            Current activity: <div id="prediction" class="bar">{{ current }}</div>
+        </h3>
+    </div>
+    <div class="button-content">
+        <button id="refresh" type="button" class="custom-button" onclick="start_refresh();">
+            update
+        </button>
+        <button id="stop_refresh" type="button" class="custom-button" onclick="stop_refresh();">
+            stop
+        </button>
+    </div>
+    <div class="info-content">
+        <h3>
+            Last update: <div id="time">{{ time }}</div>
+        </h3>
+    </div>
+</div>
+
+
 </body>
+
 </html>

@@ -1,0 +1,77 @@
+body{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Lucida Sans","Lucida Bright","Lucida Console";
+
+    background: #404040;
+}
+
+.main-content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #404040;
+
+    min-width: 650px;
+    min-height: 450px;
+
+    border-radius: 75px;
+    border: 2px solid #cccccc;
+    margin:25px;
+    padding:75px;
+
+    color: #cccccc;
+}
+
+.prediction-content{
+    text-align: center;
+    width: 500px;
+}
+
+.info-content{
+    margin-top: 50px;
+}
+
+.info-content h3{
+    font-size: medium;
+}
+
+.custom-button{
+    background: #a4a4a4;
+    border: none;
+    padding: 5px 15px;
+
+    width: 95px;
+    height: 35px;
+
+    border-radius: 4px;
+
+    margin-left: 25px;
+    margin-right: 25px;
+    font-size: medium;
+}
+
+.custom-button:hover{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+}
+
+.bar{
+    background: #00b2e3;
+    color: white;
+
+    text-align: center;
+
+    border-radius: 15px;
+
+    padding: 10px 100px;
+    margin:15px;
+
+    font-size: xx-large;
+}
+
+h3{
+    font-style: normal;
+    font-size: x-large;
+}

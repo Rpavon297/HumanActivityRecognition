@@ -1,3 +1,6 @@
+import random
+import string
+
 import numpy as np
 import SimplifiedHAR as harnet
 import matlab
@@ -9,6 +12,7 @@ from django.db.models.signals import post_save
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from datetime import datetime
 
 from predictor.models import SensorData, CurrentActivity
 from predictor.serializers import SensorDataSerializer
@@ -19,6 +23,7 @@ session = {}
 def start_up():
     print('Initializing neural network...')
     session['handle'] = harnet.initialize()
+    session['activity'] = "No data"
 
 
 def index(request):
@@ -31,32 +36,28 @@ def index(request):
             classes.append(point['activity']);
 
     context = {
-        'data': len(data),
-        'classes': classes
+        'current': session['activity'],
+        'time': datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
     }
     return render(request, 'index.html', context=context)
 
 
-def prediction(request):
-    prediction = CurrentActivity.objects.all()
-
-    context = {
-        'prediction': prediction
-    }
-
-    return render(request, 'prediction.html', context=context)
+def current(request):
+    if request.is_ajax():
+        return JsonResponse({
+            'current': session['activity'],
+            'time': datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
+        })
 
 
 def lstm(data):
-    # return session['handle'].predict(data.tolist())
     list = data.tolist()
 
     for i in range(0, len(data)):
         for j in range(0, len(data[i])):
             list[i][j] = float(list[i][j])
 
-    session['handle'].predict(matlab.double(list))
-    return "hey"
+    return session['handle'].predict(matlab.double(list))
 
 
 class MakePrediction(APIView):
@@ -78,6 +79,8 @@ class MakePrediction(APIView):
 
             self.response = lstm(X)
 
+            session['activity'] = self.response
+            print(self.response)
             # current_activity = CurrentActivity.objects.get_or_create(device_key=request.data['device_key'])
             # current_activity.activity = self.response
             # current_activity.save()
@@ -173,4 +176,4 @@ def update_view(sender, instance, **kwargs):
     # print("[" + str(instance.instant) + "]: " + prediction)
 
 
-post_save.connect(update_view, sender=SensorData)
+post_save.connect(update_view, sender=CurrentActivity)
