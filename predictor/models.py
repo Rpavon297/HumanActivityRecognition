@@ -2,17 +2,17 @@ from django.db import models
 
 
 class SensorData(models.Model):
-    accelx = models.DecimalField(max_digits=30, decimal_places=10)
-    accely = models.DecimalField(max_digits=30, decimal_places=10)
-    accelz = models.DecimalField(max_digits=30, decimal_places=10)
+    accelx = models.CharField(max_length=30, null=False)
+    accely = models.CharField(max_length=30, null=False)
+    accelz = models.CharField(max_length=30, null=False)
 
-    gyrox = models.DecimalField(max_digits=30, decimal_places=10)
-    gyroy = models.DecimalField(max_digits=30, decimal_places=10)
-    gyroz = models.DecimalField(max_digits=30, decimal_places=10)
+    gyrox = models.CharField(max_length=30, null=False)
+    gyroy = models.CharField(max_length=30, null=False)
+    gyroz = models.CharField(max_length=30, null=False)
 
-    orientx = models.DecimalField(max_digits=30, decimal_places=10)
-    orienty = models.DecimalField(max_digits=30, decimal_places=10)
-    orientz = models.DecimalField(max_digits=30, decimal_places=10)
+    orientx = models.CharField(max_length=30, null=False)
+    orienty = models.CharField(max_length=30, null=False)
+    orientz = models.CharField(max_length=30, null=False)
 
     sequence = models.CharField(max_length=100, null=False)
 

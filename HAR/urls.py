@@ -17,7 +17,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import RedirectView
 
+from HAR.views import redirect_view
+
 urlpatterns = [
+    path('', redirect_view),
     path('predictor/', include('predictor.urls')),
     path('admin/', admin.site.urls),
 ]

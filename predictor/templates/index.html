@@ -18,9 +18,12 @@
                 console.log('done');
                 $("#prediction").html(data['current']);
                 $("#time").html(data['time']);
+                $("#chance").html(data['chance'] + "%");
 
                 if(refreshing) {
                     setTimeout(refresh, 1000);
+                }else{
+                    $("#status").html('Offline');
                 }
             }
         })
@@ -29,30 +32,39 @@
     function start_refresh(){
         refreshing = true;
         refresh();
+        $("#status").html('Online');
+        $("#refresh").attr("disabled",true);
+        $("#stop_refresh").attr("disabled",false);
     }
 
     function stop_refresh() {
         refreshing = false;
+        $("#refresh").attr("disabled",false);
+        $("#stop_refresh").attr("disabled",true);
     }
 </script>
 <body>
 <div class="main-content">
     <div class="prediction-content">
         <h3>
-            Current activity: <div id="prediction" class="bar">{{ current }}</div>
+            <div id="status"> Offline </div>
+            <div id="prediction" class="bar">{{ current }}</div>
         </h3>
     </div>
     <div class="button-content">
         <button id="refresh" type="button" class="custom-button" onclick="start_refresh();">
-            update
+            Start
         </button>
-        <button id="stop_refresh" type="button" class="custom-button" onclick="stop_refresh();">
-            stop
+        <button id="stop_refresh" type="button" class="custom-button" disabled = "true" onclick="stop_refresh();">
+            Stop
         </button>
     </div>
     <div class="info-content">
         <h3>
-            Last update: <div id="time">{{ time }}</div>
+            Last update: <div id="time" class="info-tag">{{ time }}</div>
+        </h3>
+        <h3>
+            Certainty: <div id="chance" class="info-tag">{{ chance }}%</div>
         </h3>
     </div>
 </div>

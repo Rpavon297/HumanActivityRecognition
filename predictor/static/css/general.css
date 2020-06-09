@@ -31,10 +31,15 @@ body{
 
 .info-content{
     margin-top: 50px;
+    text-align: center;
 }
 
 .info-content h3{
     font-size: medium;
+}
+
+.info-tag{
+    font-size: large;
 }
 
 .custom-button{
